@@ -1,0 +1,30 @@
+//Flowchart
+
+class engine {
+private:
+    std::vector<objects> render_list;
+
+
+public:
+
+    eventHandler(&args);
+    update(&render_list);      //As in, update position, velocity, etc.
+    render(&render_list);      //As in, draw the objects
+};
+
+
+
+
+
+
+TODO:
+    -Add a way to add objects to the render list
+    -Make a hitbox class
+        Hitbox/Object relationship:
+        if (hasHitbox) {
+            object->hitbox = hitbox(object::position, object::size);
+        } else {
+            object->hitbox = nullptr;
+        }
+
+

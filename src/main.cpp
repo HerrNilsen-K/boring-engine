@@ -7,20 +7,20 @@
 #include <memory>
 #include <chrono>
 
-class objects {
-};
+#include "object.hpp"
+
 
 using timeStamp = std::chrono::time_point<std::chrono::steady_clock>;
 
 class boringEngine {
 private:
-    std::vector<objects> objectList;
+    std::vector<object> m_objectList;
 
-    void render(std::vector<objects> objectList) {
+    void render(std::vector<object> objectList) {
 
     }
 
-    void update(std::vector<objects> objectList, double time) {
+    void update(std::vector<object> objectList, double time) {
     }
 
     [[noreturn]] void mainLoop() {
@@ -29,12 +29,13 @@ private:
         timeStamp previousTime = std::chrono::steady_clock::now();
         timeStamp currentTime = std::chrono::steady_clock::now();
 
+
         while (true) {
             previousTime = currentTime;
             currentTime = std::chrono::steady_clock::now();
             deltaTime = std::chrono::duration<double, std::milli>(currentTime - previousTime).count();
-            update(objectList, deltaTime);
-            render(objectList);
+            update(m_objectList, deltaTime);
+            render(m_objectList);
 
         }
     }

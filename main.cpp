@@ -22,7 +22,6 @@ private:
     }
 
     void update(std::vector<objects> objectList, double time) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     [[noreturn]] void mainLoop() {

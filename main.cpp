@@ -5,8 +5,13 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <chrono>
+#include <thread>
 
-class objects;
+class objects {
+};
+
+using timeStamp = std::chrono::time_point<std::chrono::steady_clock>;
 
 class boringEngine {
 private:
@@ -16,16 +21,24 @@ private:
 
     }
 
-    //TODO Change time type
     void update(std::vector<objects> objectList, double time) {
-
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-//TODO Use proper time type
-    void mainLoop(double deltaTime) {
+    [[noreturn]] void mainLoop() {
+        //TODO change true to something like window.run() when window is implemented
+        double deltaTime = 1;
+        timeStamp previousTime = std::chrono::steady_clock::now();
+        timeStamp currentTime = std::chrono::steady_clock::now();
 
-        update(objectList, deltaTime);
-        render(objectList);
+        while (true) {
+            previousTime = currentTime;
+            currentTime = std::chrono::steady_clock::now();
+            deltaTime = std::chrono::duration<double, std::milli>(currentTime - previousTime).count();
+            update(objectList, deltaTime);
+            render(objectList);
+
+        }
     }
 
 public:
@@ -37,7 +50,7 @@ public:
 
     boringEngine() {
         initEngine();
-        mainLoop(0);
+        mainLoop();
     }
 
     ~boringEngine() {

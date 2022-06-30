@@ -26,5 +26,7 @@ TODO:
         } else {
             object->hitbox = nullptr;
         }
+    -Add window handling
+    -Add input handling
 
 

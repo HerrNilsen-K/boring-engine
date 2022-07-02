@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 
+
 enum class objectForm {
     RECTANGLE
 };
@@ -35,7 +36,19 @@ public:
 
     sprite &operator=(sprite &&other) noexcept;
 
+    void setPosition(const glm::vec3 &position);
+
+    void setRotation(const glm::vec3 &rotation);
+
+    void setScale(const glm::vec3 &scale);
+
+    void setView(const glm::mat4 &view);
+
+    void setProjection(const glm::mat4 &projection);
+
     void render();
+
+    void update(double delta);
 
     ~sprite();
 
@@ -67,6 +80,8 @@ public:
                     form);
 
     void render();
+
+    void update(double delta);
 
 
 };

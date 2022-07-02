@@ -8,6 +8,8 @@
 #include <string>
 
 #include <GL/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //Create debugCallback function
 void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
@@ -15,7 +17,7 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
     std::cout << "Debug message (" << source << "): " << message << std::endl;
 }
 
-sprite::sprite(std::vector<float>& vertices)
+sprite::sprite(std::vector<float> &vertices)
         : position(glm::vec3(0.0f, 0.0f, 0.0f)),
           rotation(glm::vec3(0.0f, 0.0f, 0.0f)),
           scale(glm::vec3(1.0f, 1.0f, 1.0f)),
@@ -40,9 +42,10 @@ sprite::sprite(std::vector<float>& vertices)
     std::string vertexShaderSource =
             "#version 330 core\n"
             "layout (location = 0) in vec3 aPos;\n"
+            "uniform mat4 MVP;\n"
             "void main()\n"
             "{\n"
-            "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+            "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0) * MVP;\n"
             "}\n";
 
     std::string fragmentShaderSource =
@@ -112,6 +115,7 @@ object::object(std::vector<float> vertices)
 }
 
 void sprite::render() {
+    glUseProgram(shader);
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
@@ -125,6 +129,15 @@ void object::render() {
 
 object::object(objectForm form)
         : m_sprite(form) {
+    switch (form) {
+        case objectForm::RECTANGLE:
+            m_sprite.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+            m_sprite.setPosition(glm::vec3(200.0f, 0.0f, 0.0f));
+            m_sprite.setScale(glm::vec3(1.0f, 1.0f, 1.0f));
+            m_sprite.setProjection(glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f));
+            m_sprite.setView(glm::mat4(1.0f));
+            break;
+    }
 }
 
 sprite::sprite(objectForm form) {
@@ -197,4 +210,44 @@ sprite::sprite(sprite &&other) noexcept {
     other.vao = 0;
     other.vbo = 0;
     other.shader = 0;
+}
+
+void sprite::setPosition(const glm::vec3 &position) {
+    sprite::position = position;
+}
+
+void sprite::setRotation(const glm::vec3 &rotation) {
+    sprite::rotation = rotation;
+}
+
+void sprite::setScale(const glm::vec3 &scale) {
+    sprite::scale = scale;
+}
+
+void sprite::setView(const glm::mat4 &view) {
+    sprite::view = view;
+}
+
+void sprite::setProjection(const glm::mat4 &projection) {
+    sprite::projection = projection;
+}
+
+void sprite::update(double delta) {
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, position);
+    model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, scale);
+    MVP = projection * view * model;
+
+    glUseProgram(shader);
+    glUniformMatrix4fv(
+            glGetUniformLocation(shader, "MVP"),
+            1, GL_FALSE, glm::value_ptr(MVP));
+
+}
+
+void object::update(double delta) {
+    m_sprite.update(delta);
 }

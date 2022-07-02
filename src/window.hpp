@@ -21,6 +21,10 @@ public:
     window(int width, int height);
 
     bool isRunning();
+
+    GLsizei getWidth();
+
+    GLsizei getHeight();
 };
 
 

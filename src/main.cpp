@@ -10,7 +10,6 @@
 #include "object.hpp"
 #include "window.hpp"
 
-
 using timeStamp = std::chrono::time_point<std::chrono::steady_clock>;
 
 class boringEngine {
@@ -20,10 +19,17 @@ private:
 
     void render(std::vector<object> &objectList) {
 
+        for (auto &object : objectList) {
+            object.render();
+        }
+
         m_window.swapBuffers();
     }
 
     void update(std::vector<object> &objectList, double time) {
+        for (auto &object : objectList) {
+            object.update(time);
+        }
     }
 
     void mainLoop() {
@@ -37,23 +43,24 @@ private:
             previousTime = currentTime;
             currentTime = std::chrono::steady_clock::now();
             deltaTime = std::chrono::duration<double, std::milli>(currentTime - previousTime).count();
+
             m_window.poolEvents();
             update(m_objectList, deltaTime);
-            m_objectList.at(0).render();
             render(m_objectList);
+            glViewport(0, 0, m_window.getWidth(), m_window.getHeight());
 
         }
     }
 
 public:
     //TODO Create window, create context, etc.
-    bool initEngine() {
+    [[maybe_unused]]bool initEngine() {
 
         return true;
     }
 
     boringEngine()
-        : m_window(800, 600) {
+            : m_window(800, 600) {
         initEngine();
     }
 

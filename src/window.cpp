@@ -32,3 +32,15 @@ void window::poolEvents() {
 void window::swapBuffers() {
     glfwSwapBuffers(m_window);
 }
+
+GLsizei window::getWidth() {
+    GLsizei width;
+    glfwGetWindowSize(m_window, &width, nullptr);
+    return width;
+}
+
+GLsizei window::getHeight() {
+    GLsizei height;
+    glfwGetWindowSize(m_window, nullptr, &height);
+    return height;
+}

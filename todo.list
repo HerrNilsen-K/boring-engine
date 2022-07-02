@@ -19,7 +19,6 @@ public:
 
 TODO:
     -Create Object class
-    -Add a way to add objects to the render list
     -Create Renderer
     -Make a hitbox class
         Hitbox/Object relationship:
@@ -29,6 +28,6 @@ TODO:
             object->hitbox = nullptr;
         }
     -Add window handling
-    -Add input handling
+        -Add input handling
 
 

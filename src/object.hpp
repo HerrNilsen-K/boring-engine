@@ -7,6 +7,39 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <map>
+
+enum class objectForm {
+    RECTANGLE
+};
+
+
+//Helper class for OpenGL
+class sprite {
+private:
+    unsigned int vao, vbo;
+    unsigned int shader;
+    glm::vec3 position, rotation, scale;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::mat4 MVP;
+
+public:
+    explicit sprite(std::vector<float> &
+    vertices);
+
+    explicit sprite(objectForm form);
+
+    sprite(sprite &&other) noexcept;
+
+    sprite &operator=(sprite &&other) noexcept;
+
+    void render();
+
+    ~sprite();
+
+};
 
 class object {
     /*PROPERTIES
@@ -19,29 +52,22 @@ class object {
      * rotation,
      * scale,
      * */
+
 protected:
 
-    //Helper class for OpenGL
-    class sprite {
-    private:
-        unsigned int vao, vbo;
-        unsigned int shader;
-        glm::vec3 position, rotation, scale;
-        glm::mat4 model;
-        glm::mat4 view;
-        glm::mat4 projection;
-        glm::mat4 MVP;
-
-    public:
-        sprite(std::vector<float> vertices);
-
-        ~sprite();
-
-    };
 
     sprite m_sprite;
 
-    object(std::vector<float> vertices);
+public:
+
+    explicit object(std::vector<float>
+                    vertices);
+
+    explicit object(objectForm
+                    form);
+
+    void render();
+
 
 };
 

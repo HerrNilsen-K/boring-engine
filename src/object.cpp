@@ -9,7 +9,24 @@
 
 #include <GL/glew.h>
 
-object::sprite::sprite(std::vector<float> vertices) {
+//Create debugCallback function
+void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
+                   const void *userParam) {
+    std::cout << "Debug message (" << source << "): " << message << std::endl;
+}
+
+sprite::sprite(std::vector<float>& vertices)
+        : position(glm::vec3(0.0f, 0.0f, 0.0f)),
+          rotation(glm::vec3(0.0f, 0.0f, 0.0f)),
+          scale(glm::vec3(1.0f, 1.0f, 1.0f)),
+          model(glm::mat4(1.0f)),
+          view(glm::mat4(1.0f)),
+          projection(glm::mat4(1.0f)),
+          MVP(glm::mat4(1.0f)) {
+    //TODO Use proper debug callback
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(debugCallback, nullptr);
+
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glGenBuffers(1, &vbo);
@@ -46,7 +63,7 @@ object::sprite::sprite(std::vector<float> vertices) {
     const char *vertexShaderSourcePtr = vertexShaderSource.c_str();
     glShaderSource(vertexShader, 1, &vertexShaderSourcePtr, NULL);
     glCompileShader(vertexShader);
-    //CHeck for errors
+    //Check for errors
     GLint success;
     GLchar infoLog[512];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
@@ -73,6 +90,7 @@ object::sprite::sprite(std::vector<float> vertices) {
     glLinkProgram(shader);
     //Check for errors
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
+    glUseProgram(shader);
     if (!success) {
         glGetProgramInfoLog(shader, 512, NULL, infoLog);
         //TODO: Handle error
@@ -81,16 +99,102 @@ object::sprite::sprite(std::vector<float> vertices) {
     //Delete shaders
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-
 }
 
-object::sprite::~sprite() {
+sprite::~sprite() {
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteProgram(shader);
 }
 
 object::object(std::vector<float> vertices)
-    : m_sprite(vertices) {
+        : m_sprite(vertices) {
+}
 
+void sprite::render() {
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
+
+void object::render() {
+    m_sprite.render();
+
+}
+
+object::object(objectForm form)
+        : m_sprite(form) {
+}
+
+sprite::sprite(objectForm form) {
+    std::vector<float> vertices;
+    switch (form) {
+        case objectForm::RECTANGLE:
+            //Assign values from -1 to 1  to form a rectangle
+            vertices = {
+                    -1.0f, -1.0f, 0.0f,
+                    1.0f, -1.0f, 0.0f,
+                    -1.0f, 1.0f, 0.0f,
+                    1.0f, 1.0f, 0.0f,
+                    1.0f, -1.0f, 0.0f,
+                    -1.0f, 1.0f, 0.0f
+            };
+            break;
+    }
+
+    sprite s(vertices);
+    *this = std::move(s);
+}
+
+
+sprite &sprite::operator=(sprite &&other) noexcept {
+    position = other.position;
+    rotation = other.rotation;
+    scale = other.scale;
+    model = other.model;
+    view = other.view;
+    projection = other.projection;
+    MVP = other.MVP;
+    vao = other.vao;
+    vbo = other.vbo;
+    shader = other.shader;
+
+    other.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    other.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+    other.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    other.model = glm::mat4(1.0f);
+    other.view = glm::mat4(1.0f);
+    other.projection = glm::mat4(1.0f);
+    other.MVP = glm::mat4(1.0f);
+    other.vao = 0;
+    other.vbo = 0;
+    other.shader = 0;
+
+    return *this;
+}
+
+sprite::sprite(sprite &&other) noexcept {
+    position = other.position;
+    rotation = other.rotation;
+    scale = other.scale;
+    model = other.model;
+    view = other.view;
+    projection = other.projection;
+    MVP = other.MVP;
+    vao = other.vao;
+    vbo = other.vbo;
+    shader = other.shader;
+
+    //Set other to default state
+    other.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    other.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+    other.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    other.model = glm::mat4(1.0f);
+    other.view = glm::mat4(1.0f);
+    other.projection = glm::mat4(1.0f);
+    other.MVP = glm::mat4(1.0f);
+    other.vao = 0;
+    other.vbo = 0;
+    other.shader = 0;
 }

@@ -8,7 +8,7 @@ private:
 public:
 
     eventHandler(&args);
-    update(&render_list);      //As in, update position, velocity, etc.
+    update(&render_list);      //As in, update translation, velocity, etc.
     render(&render_list);      //As in, draw the objects
 };
 
@@ -23,7 +23,7 @@ TODO:
     -Make a hitbox class
         Hitbox/Object relationship:
         if (hasHitbox) {
-            object->hitbox = hitbox(object::position, object::size);
+            object->hitbox = hitbox(object::translation, object::size);
         } else {
             object->hitbox = nullptr;
         }

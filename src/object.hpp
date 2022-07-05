@@ -20,7 +20,7 @@ class sprite {
 private:
     unsigned int vao, vbo;
     unsigned int shader;
-    glm::vec3 position, rotation, scale;
+    glm::vec3 translation, rotation, scale;
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
@@ -36,7 +36,7 @@ public:
 
     sprite &operator=(sprite &&other) noexcept;
 
-    void setPosition(const glm::vec3 &position);
+    void setTranslation(const glm::vec3 &translation);
 
     void setRotation(const glm::vec3 &rotation);
 
@@ -61,7 +61,7 @@ class object {
      * ebo (left out for now),
      * shader,
      * texture (left out for now)
-     * position,
+     * translation,
      * rotation,
      * scale,
      * */

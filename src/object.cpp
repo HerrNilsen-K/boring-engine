@@ -18,13 +18,14 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
 }
 
 sprite::sprite(std::vector<float> &vertices)
-        : position(glm::vec3(0.0f, 0.0f, 0.0f)),
-          rotation(glm::vec3(0.0f, 0.0f, 0.0f)),
-          scale(glm::vec3(1.0f, 1.0f, 1.0f)),
-          model(glm::mat4(1.0f)),
-          view(glm::mat4(1.0f)),
-          projection(glm::mat4(1.0f)),
-          MVP(glm::mat4(1.0f)) {
+        :
+        translation(glm::vec3(0.0f, 0.0f, 0.0f)),
+        rotation(glm::vec3(0.0f, 0.0f, 0.0f)),
+        scale(glm::vec3(1.0f, 1.0f, 1.0f)),
+        model(glm::mat4(1.0f)),
+        view(glm::mat4(1.0f)),
+        projection(glm::mat4(1.0f)),
+        MVP(glm::mat4(1.0f)) {
     //TODO Use proper debug callback
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(debugCallback, nullptr);
@@ -131,11 +132,9 @@ object::object(objectForm form)
         : m_sprite(form) {
     switch (form) {
         case objectForm::RECTANGLE:
-            /*
             m_sprite.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-            m_sprite.setPosition(glm::vec3(000.0f, 0.0f, 0.0f));
+            m_sprite.setTranslation(glm::vec3(00.f, 0.0f, 0.0f));
             m_sprite.setScale(glm::vec3(1.0f, 1.0f, 1.0f));
-            */
             //TODO Get window size and set Projection accordingly
             m_sprite.setProjection(glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f));
             m_sprite.setView(glm::mat4(1.0f));
@@ -176,7 +175,7 @@ sprite::sprite(objectForm form) {
 
 
 sprite &sprite::operator=(sprite &&other) noexcept {
-    position = other.position;
+    translation = other.translation;
     rotation = other.rotation;
     scale = other.scale;
     model = other.model;
@@ -187,7 +186,7 @@ sprite &sprite::operator=(sprite &&other) noexcept {
     vbo = other.vbo;
     shader = other.shader;
 
-    other.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    other.translation = glm::vec3(0.0f, 0.0f, 0.0f);
     other.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
     other.scale = glm::vec3(1.0f, 1.0f, 1.0f);
     other.model = glm::mat4(1.0f);
@@ -202,7 +201,7 @@ sprite &sprite::operator=(sprite &&other) noexcept {
 }
 
 sprite::sprite(sprite &&other) noexcept {
-    position = other.position;
+    translation = other.translation;
     rotation = other.rotation;
     scale = other.scale;
     model = other.model;
@@ -214,7 +213,7 @@ sprite::sprite(sprite &&other) noexcept {
     shader = other.shader;
 
     //Set other to default state
-    other.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    other.translation = glm::vec3(0.0f, 0.0f, 0.0f);
     other.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
     other.scale = glm::vec3(1.0f, 1.0f, 1.0f);
     other.model = glm::mat4(1.0f);
@@ -226,9 +225,6 @@ sprite::sprite(sprite &&other) noexcept {
     other.shader = 0;
 }
 
-void sprite::setPosition(const glm::vec3 &position) {
-    sprite::position = position;
-}
 
 void sprite::setRotation(const glm::vec3 &rotation) {
     sprite::rotation = rotation;
@@ -248,20 +244,24 @@ void sprite::setProjection(const glm::mat4 &projection) {
 
 void sprite::update(double delta) {
     model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
+    model = glm::scale(model, scale);
     model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, scale);
+    model = glm::translate(model, translation);
+    view = glm::mat4(1.0f);
     MVP = projection * view * model;
 
     glUseProgram(shader);
     glUniformMatrix4fv(
             glGetUniformLocation(shader, "MVP"),
-            1, GL_FALSE, glm::value_ptr(MVP));
-
+            1, GL_TRUE, glm::value_ptr(MVP));
 }
 
 void object::update(double delta) {
     m_sprite.update(delta);
+}
+
+void sprite::setTranslation(const glm::vec3 &translation) {
+    sprite::translation = translation;
 }

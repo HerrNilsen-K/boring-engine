@@ -131,10 +131,13 @@ object::object(objectForm form)
         : m_sprite(form) {
     switch (form) {
         case objectForm::RECTANGLE:
+            /*
             m_sprite.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-            m_sprite.setPosition(glm::vec3(200.0f, 0.0f, 0.0f));
+            m_sprite.setPosition(glm::vec3(000.0f, 0.0f, 0.0f));
             m_sprite.setScale(glm::vec3(1.0f, 1.0f, 1.0f));
-            m_sprite.setProjection(glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f));
+            */
+            //TODO Get window size and set Projection accordingly
+            m_sprite.setProjection(glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f));
             m_sprite.setView(glm::mat4(1.0f));
             break;
     }
@@ -142,9 +145,11 @@ object::object(objectForm form)
 
 sprite::sprite(objectForm form) {
     std::vector<float> vertices;
+    //TODO Get window size and set Position accordingly
     switch (form) {
         case objectForm::RECTANGLE:
             //Assign values from -1 to 1  to form a rectangle
+            /* NC
             vertices = {
                     -1.0f, -1.0f, 0.0f,
                     1.0f, -1.0f, 0.0f,
@@ -152,6 +157,15 @@ sprite::sprite(objectForm form) {
                     1.0f, 1.0f, 0.0f,
                     1.0f, -1.0f, 0.0f,
                     -1.0f, 1.0f, 0.0f
+            };
+            */
+            vertices = {
+                    -400.f, -300.f, 0.0f,
+                    400.f, -300.f, 0.0f,
+                    -400.f, 300.f, 0.0f,
+                    400.f, 300.f, 0.0f,
+                    400.f, -300.f, 0.0f,
+                    -400.f, 300.f, 0.0f
             };
             break;
     }

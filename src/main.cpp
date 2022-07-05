@@ -47,7 +47,7 @@ private:
             m_window.poolEvents();
             update(m_objectList, deltaTime);
             render(m_objectList);
-            glViewport(0, 0, m_window.getWidth(), m_window.getHeight());
+            //glViewport(0, 0, m_window.getWidth(), m_window.getHeight());
 
         }
     }

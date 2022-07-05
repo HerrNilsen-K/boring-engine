@@ -18,8 +18,8 @@ public:
 
 
 TODO:
-    -Create Object class
-    -Create Renderer
+    working-Create Object class
+    working-Create Renderer
     -Make a hitbox class
         Hitbox/Object relationship:
         if (hasHitbox) {

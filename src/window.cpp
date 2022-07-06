@@ -18,6 +18,7 @@ window::window(int width, int height)
         std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
         exit(EXIT_FAILURE);
     }
+    glfwSetWindowUserPointer(m_window, this);
 
 }
 
@@ -43,4 +44,14 @@ GLsizei window::getHeight() {
     GLsizei height;
     glfwGetWindowSize(m_window, nullptr, &height);
     return height;
+}
+
+void window::onResizeInit(std::function<void(int, int)> callback) {
+    m_onResize = callback;
+    glfwSetFramebufferSizeCallback(m_window, onResize);
+}
+
+void window::onResize(GLFWwindow *window, int width, int height) {
+    class window *w = reinterpret_cast<class window *>(glfwGetWindowUserPointer(window));
+    w->m_onResize(width, height);
 }

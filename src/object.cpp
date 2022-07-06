@@ -17,7 +17,7 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
     std::cout << "Debug message (" << source << "): " << message << std::endl;
 }
 
-sprite::sprite(std::vector<float> &vertices)
+sprite::sprite(std::vector<float> &vertices, int windowWidth, int windowHeight)
         :
         translation(glm::vec3(0.0f, 0.0f, 0.0f)),
         rotation(glm::vec3(0.0f, 0.0f, 0.0f)),
@@ -26,6 +26,7 @@ sprite::sprite(std::vector<float> &vertices)
         view(glm::mat4(1.0f)),
         projection(glm::mat4(1.0f)),
         MVP(glm::mat4(1.0f)) {
+
     //TODO Use proper debug callback
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(debugCallback, nullptr);
@@ -85,6 +86,7 @@ sprite::sprite(std::vector<float> &vertices)
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        //TODO: Handle error
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
@@ -111,8 +113,8 @@ sprite::~sprite() {
     glDeleteProgram(shader);
 }
 
-object::object(std::vector<float> vertices)
-        : m_sprite(vertices) {
+object::object(std::vector<float> vertices, int windowWidth, int windowHeight)
+        : m_sprite(vertices, windowWidth, windowHeight) {
 }
 
 void sprite::render() {
@@ -128,27 +130,31 @@ void object::render() {
 
 }
 
-object::object(objectForm form)
-        : m_sprite(form) {
+object::object(objectForm form, int windowWidth, int windowHeight)
+        : m_sprite(form, windowWidth, windowHeight) {
     switch (form) {
         case objectForm::RECTANGLE:
             m_sprite.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
             m_sprite.setTranslation(glm::vec3(00.f, 0.0f, 0.0f));
             m_sprite.setScale(glm::vec3(1.0f, 1.0f, 1.0f));
-            //TODO Get window size and set Projection accordingly
-            m_sprite.setProjection(glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f));
+
+            //The setProjection function is identical to the commented one, but it is uses screen coordinates
+            // m_sprite.setProjection(glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f));
+            m_sprite.setProjection(glm::ortho(-static_cast<float>(windowWidth) / 2.0f,
+                                              static_cast<float>(windowWidth) / 2.0f,
+                                              -static_cast<float>(windowHeight) / 2.0f,
+                                              static_cast<float>(windowHeight) / 2.0f,
+                                              -1.0f, 1.0f));
             m_sprite.setView(glm::mat4(1.0f));
             break;
     }
 }
 
-sprite::sprite(objectForm form) {
+sprite::sprite(objectForm form, int windowWidth, int windowHeight) {
     std::vector<float> vertices;
-    //TODO Get window size and set Position accordingly
     switch (form) {
         case objectForm::RECTANGLE:
-            //Assign values from -1 to 1  to form a rectangle
-            /* NC
+            /* NDC
             vertices = {
                     -1.0f, -1.0f, 0.0f,
                     1.0f, -1.0f, 0.0f,
@@ -156,20 +162,20 @@ sprite::sprite(objectForm form) {
                     1.0f, 1.0f, 0.0f,
                     1.0f, -1.0f, 0.0f,
                     -1.0f, 1.0f, 0.0f
-            };
-            */
+            };*/
+            //The values are identical to the NDCs above, but they are in screen coordinates
             vertices = {
-                    -400.f, -300.f, 0.0f,
-                    400.f, -300.f, 0.0f,
-                    -400.f, 300.f, 0.0f,
-                    400.f, 300.f, 0.0f,
-                    400.f, -300.f, 0.0f,
-                    -400.f, 300.f, 0.0f
+                    -static_cast<float>(windowWidth) / 2.0f, -static_cast<float>(windowHeight) / 2.0f, 0.0f,
+                    static_cast<float>(windowWidth) / 2.0f, -static_cast<float>(windowHeight) / 2.0f, 0.0f,
+                    -static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f, 0.0f,
+                    static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f, 0.0f,
+                    static_cast<float>(windowWidth) / 2.0f, -static_cast<float>(windowHeight) / 2.0f, 0.0f,
+                    -static_cast<float>(windowWidth) / 2.0f, static_cast<float>(windowHeight) / 2.0f, 0.0f
             };
             break;
     }
 
-    sprite s(vertices);
+    sprite s(vertices, windowWidth, windowHeight);
     *this = std::move(s);
 }
 
@@ -227,19 +233,19 @@ sprite::sprite(sprite &&other) noexcept {
 
 
 void sprite::setRotation(const glm::vec3 &rotation) {
-    sprite::rotation = rotation;
+    this->rotation = rotation;
 }
 
 void sprite::setScale(const glm::vec3 &scale) {
-    sprite::scale = scale;
+    this->scale = scale;
 }
 
 void sprite::setView(const glm::mat4 &view) {
-    sprite::view = view;
+    this->view = view;
 }
 
 void sprite::setProjection(const glm::mat4 &projection) {
-    sprite::projection = projection;
+    this->projection = projection;
 }
 
 void sprite::update(double delta) {
@@ -263,5 +269,14 @@ void object::update(double delta) {
 }
 
 void sprite::setTranslation(const glm::vec3 &translation) {
-    sprite::translation = translation;
+    this->translation = translation;
+}
+
+void sprite::updateWindowSize(int width, int height) {
+    windowHeight = height;
+    windowWidth = width;
+}
+
+void object::updateWindowSize(int width, int height) {
+    m_sprite.updateWindowSize(width, height);
 }

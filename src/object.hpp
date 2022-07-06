@@ -26,11 +26,12 @@ private:
     glm::mat4 projection;
     glm::mat4 MVP;
 
-public:
-    explicit sprite(std::vector<float> &
-    vertices);
+    unsigned int windowWidth, windowHeight;
 
-    explicit sprite(objectForm form);
+public:
+    explicit sprite(std::vector<float> &vertices, int windowWidth, int windowHeight);
+
+    explicit sprite(objectForm form, int windowWidth, int windowHeight);
 
     sprite(sprite &&other) noexcept;
 
@@ -45,6 +46,8 @@ public:
     void setView(const glm::mat4 &view);
 
     void setProjection(const glm::mat4 &projection);
+
+    void updateWindowSize(int width, int height);
 
     void render();
 
@@ -73,16 +76,15 @@ protected:
 
 public:
 
-    explicit object(std::vector<float>
-                    vertices);
+    explicit object(std::vector<float> vertices, int windowWidth, int windowHeight);
 
-    explicit object(objectForm
-                    form);
+    explicit object(objectForm form, int windowWidth, int windowHeight);
 
     void render();
 
     void update(double delta);
 
+    void updateWindowSize(int width, int height);
 
 };
 

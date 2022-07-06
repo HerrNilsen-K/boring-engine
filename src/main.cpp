@@ -40,7 +40,7 @@ private:
         timeStamp previousTime = std::chrono::steady_clock::now();
         timeStamp currentTime = std::chrono::steady_clock::now();
 
-        m_objectList.emplace_back(objectForm::RECTANGLE);
+        m_objectList.emplace_back(objectForm::RECTANGLE, m_window.getWidth(), m_window.getHeight());
 
         while (m_window.isRunning()) {
             previousTime = currentTime;
@@ -67,6 +67,9 @@ public:
 
         m_window.onResizeInit([&](int width, int height) {
             std::cout << "Resized to " << width << "x" << height << std::endl;
+            for(auto &object : m_objectList) {
+                object.updateWindowSize(width, height);
+            }
             glViewport(0, 0, m_window.getWidth(), m_window.getHeight());
             update(m_objectList, deltaTime);
             render(m_objectList);
